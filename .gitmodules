@@ -1,0 +1,7 @@
+[submodule "lib/cereal"]
+	path = lib/cereal
+	url = https://github.com/osum4est/cereal
+[submodule "lib/json"]
+	path = lib/json
+	url = https://github.com/nlohmann/json
+	shallow = true

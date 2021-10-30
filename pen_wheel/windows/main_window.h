@@ -7,15 +7,17 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class main_window; }
 QT_END_NAMESPACE
 
-class main_window : public QMainWindow
-{
-    Q_OBJECT
+class main_window : public QMainWindow {
+Q_OBJECT
+
+    Ui::main_window *ui;
 
 public:
     main_window(QWidget *parent = nullptr);
     ~main_window();
 
 private:
-    Ui::main_window *ui;
+    void open_wheel();
 };
-#endif // MAIN_WINDOW_H
+
+#endif
