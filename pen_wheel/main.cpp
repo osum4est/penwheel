@@ -5,6 +5,6 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     main_window w;
     w.clearFocus();
-    w.show();
+    w.hide();
     return QApplication::exec();
 }

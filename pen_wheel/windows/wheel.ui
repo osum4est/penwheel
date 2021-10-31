@@ -6,27 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>500</height>
+    <width>400</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>wheel</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="wheel_widget" name="wheel" native="true">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>200</y>
-     <width>100</width>
-     <height>100</height>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>400</height>
     </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>wheel_widget</class>
+   <extends>QWidget</extends>
+   <header location="global">pen_wheel/widgets/wheel_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
