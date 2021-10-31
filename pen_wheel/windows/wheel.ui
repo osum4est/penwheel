@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>wheel</class>
- <widget class="QWidget" name="wheel">
+ <widget class="QDialog" name="wheel">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>507</height>
+    <width>500</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>wheel</string>
   </property>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>200</y>
+     <width>100</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

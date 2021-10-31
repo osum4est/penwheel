@@ -1,18 +1,27 @@
 #include "main_window.h"
 #include "ui_main_window.h"
 #include "wheel.h"
+#include <QMouseEvent>
+#include <utils/mouse_events.h>
 
-main_window::main_window(QWidget *parent) : QMainWindow(parent), ui(new Ui::main_window) {
-    ui->setupUi(this);
+main_window::main_window(QWidget *parent) : QMainWindow(parent), _ui(new Ui::main_window) {
+    _ui->setupUi(this);
 
-    connect(ui->pushButton, &QPushButton::pressed, this, &main_window::open_wheel);
+    connect(_ui->pushButton, &QPushButton::pressed, this, &main_window::open_wheel);
+
+    auto wheel_window = new wheel();
+    hide();
 }
 
 main_window::~main_window() {
-    delete ui;
+    delete _ui;
 }
 
 void main_window::open_wheel() {
-    auto wheel_window = new wheel();
-    wheel_window->show();
+}
+
+void main_window::mousePressEvent(QMouseEvent *event) {
+    qDebug() << event->button();
+
+    QWidget::mousePressEvent(event);
 }
