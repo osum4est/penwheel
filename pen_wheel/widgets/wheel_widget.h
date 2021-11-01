@@ -14,6 +14,10 @@ Q_OBJECT
     int _slices = 12;
     int _selected_slice = -1;
 
+    float _slice_padding = 10;
+    float _slice_size = 360.0f / (float)_slices;
+    float _slice_offset = -_slice_size / 2;
+
     QColor _colors[16] = {
         QColor(0xab, 0x46, 0x42),
         QColor(0xdc, 0x96, 0x56),

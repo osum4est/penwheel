@@ -16,7 +16,6 @@ void wheel_widget::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
 
     float border_width = 5;
-    float angle_padding = 0;
 
     const int width = geometry().width() - border_width;
     const int height = geometry().height() - border_width;
@@ -27,8 +26,6 @@ void wheel_widget::paintEvent(QPaintEvent *event) {
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
 
-    float slice_size = 360.0f / (float) _slices;
-
     for (int i = 0; i < _slices; i++) {
         painter.setPen(QPen(_colors[i].darker(), border_width));
 
@@ -37,16 +34,16 @@ void wheel_widget::paintEvent(QPaintEvent *event) {
         else
             painter.setBrush(QBrush(_colors[i]));
 
-        float start = 90;
-        start -= (float) i * slice_size;
-        start -= angle_padding / 2;
+        float start = 90 - _slice_offset;
+        start -= (float) i * _slice_size;
+        start -= _slice_padding / 2;
 
-        float size = slice_size - angle_padding / 2;
+        float size = _slice_size - _slice_padding;
 
         painter.drawPie(x, y, width, height, int(start * 16), -int(size * 16));
     }
 
-    int rim = 50;
+    int rim = width / 3;
     painter.setPen(Qt::NoPen);
     painter.setBrush(QBrush(Qt::white));
     painter.drawEllipse(x + rim, y + rim, width - rim - rim, height - rim - rim);
@@ -66,16 +63,9 @@ void wheel_widget::mouseMoveEvent(QMouseEvent *event) {
         return;
 
     auto angle = (float) qRadiansToDegrees(atan2(rel.y(), rel.x()));
-    if (angle < 0)
-        angle += 360;
+    float slice_angle = 360 - angle + 90 - _slice_offset;
 
-    float slice_angle = 360 - angle + 90;
-    if (slice_angle > 360)
-        slice_angle -= 360;
-
-    float slice_size = 360.0f / (float) _slices;
-    int slice = (int) (slice_angle / slice_size);
-
+    int slice = int(float(int(slice_angle) % 360) / _slice_size);
     if (slice == _selected_slice)
         return;
 
