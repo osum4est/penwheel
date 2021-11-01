@@ -11,6 +11,8 @@ class wheel_widget : public QWidget {
 Q_OBJECT
 
     Ui::wheel_widget *_ui;
+    int _slices = 12;
+    int _selected_slice = -1;
 
     QColor _colors[16] = {
         QColor(0xab, 0x46, 0x42),
@@ -56,6 +58,9 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 };
 
 

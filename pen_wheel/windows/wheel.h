@@ -12,19 +12,28 @@ QT_END_NAMESPACE
 class wheel : public QDialog, public mouse_event_handler{
 Q_OBJECT
 
+public:
+    enum wheel_state {
+        hidden,
+        floating,
+        active
+    };
+
+private:
     Ui::wheel *_ui;
-    bool _active;
+    wheel_state _state;
 
 public:
     explicit wheel(QWidget *parent = nullptr);
     ~wheel() override;
 
-    void mouse_moved(const QPointF &pos) override;
-    void mouse_down(const Qt::MouseButton &button) override;
-    void mouse_up(const Qt::MouseButton &button) override;
+    bool mouse_moved(const QPointF &pos) override;
+    bool mouse_down(const Qt::MouseButton &button) override;
+    bool mouse_up(const Qt::MouseButton &button) override;
 
 private:
-    void move_window(const QPointF pos);
+    void set_state(wheel_state state);
+    void move_window(const QPointF &pos);
 };
 
 #endif

@@ -3,9 +3,12 @@
 #include "wheel.h"
 #include <QMouseEvent>
 #include <utils/mouse_events.h>
+#include <config/pen_wheel_config.h>
 
 main_window::main_window(QWidget *parent) : QMainWindow(parent), _ui(new Ui::main_window) {
     _ui->setupUi(this);
+
+    setAttribute(Qt::WA_ShowWithoutActivating, true);
 
     connect(_ui->pushButton, &QPushButton::pressed, this, &main_window::open_wheel);
 

@@ -7,19 +7,16 @@ bool mouse_events::run(mouse_event_handler *handler) {
     return run();
 }
 
-void mouse_events::mouse_moved(const QPointF &pos) {
-    if (_handler != nullptr)
-        _handler->mouse_moved(pos);
+bool mouse_events::mouse_moved(const QPointF &pos) {
+    return _handler != nullptr && _handler->mouse_moved(pos);
 }
 
-void mouse_events::mouse_down(const Qt::MouseButton &button) {
-    if (_handler != nullptr)
-        _handler->mouse_down(button);
+bool mouse_events::mouse_down(const Qt::MouseButton &button) {
+    return _handler != nullptr && _handler->mouse_down(button);
 }
 
-void mouse_events::mouse_up(const Qt::MouseButton &button) {
-    if (_handler != nullptr)
-        _handler->mouse_up(button);
+bool mouse_events::mouse_up(const Qt::MouseButton &button) {
+    return _handler != nullptr && _handler->mouse_up(button);
 }
 
 #ifdef __APPLE__
@@ -55,44 +52,29 @@ bool mouse_events::run() {
             kCGHeadInsertEventTap,
             kCGEventTapOptionDefault,
             mask,
-            [](CGEventTapProxy, CGEventType type, CGEventRef event, void *user_info) {
+            [](CGEventTapProxy, CGEventType type, CGEventRef event, void *user_info) -> CGEventRef {
                 auto *self = (mouse_events *) user_info;
                 switch (type) {
                     case kCGEventMouseMoved:
-                        self->mouse_moved(QCursor::pos());
-                        break;
-                    case kCGEventLeftMouseDown:
-                        self->mouse_down(Qt::LeftButton);
-                        break;
-                    case kCGEventLeftMouseUp:
-                        self->mouse_up(Qt::LeftButton);
-                        break;
                     case kCGEventLeftMouseDragged:
-                        self->mouse_moved(QCursor::pos());
-                        break;
-                    case kCGEventRightMouseDown:
-                        self->mouse_down(Qt::RightButton);
-                        break;
-                    case kCGEventRightMouseUp:
-                        self->mouse_up(Qt::RightButton);
-                        break;
                     case kCGEventRightMouseDragged:
-                        self->mouse_moved(QCursor::pos());
-                        break;
-                    case kCGEventOtherMouseDown:
-                        self->mouse_down(get_button_from_event(event));
-                        break;
-                    case kCGEventOtherMouseUp:
-                        self->mouse_up(get_button_from_event(event));
-                        break;
                     case kCGEventOtherMouseDragged:
-                        self->mouse_moved(QCursor::pos());
-                        break;
+                        return self->mouse_moved(QCursor::pos()) ? nullptr : event;
+                    case kCGEventLeftMouseDown:
+                        return self->mouse_down(Qt::LeftButton) ? nullptr : event;
+                    case kCGEventLeftMouseUp:
+                        return self->mouse_up(Qt::LeftButton) ? nullptr : event;
+                    case kCGEventRightMouseDown:
+                        return self->mouse_down(Qt::RightButton) ? nullptr : event;
+                    case kCGEventRightMouseUp:
+                        return self->mouse_up(Qt::RightButton) ? nullptr : event;
+                    case kCGEventOtherMouseDown:
+                        return self->mouse_down(get_button_from_event(event)) ? nullptr : event;
+                    case kCGEventOtherMouseUp:
+                        return self->mouse_up(get_button_from_event(event)) ? nullptr : event;
                     default:
-                        break;
+                        return event;
                 }
-
-                return event;
             },
             this);
 
