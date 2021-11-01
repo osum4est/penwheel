@@ -1,0 +1,27 @@
+wheels:
+  - name: default
+    main: true
+    actions:
+      - name: Copy
+        action: ctrl+c
+        color: 0xffff00
+      - name: Cut
+        action: ctrl+x
+        color: 0xff0000
+      - name: Paste
+        action: ctrl+v
+        color: 0x00ff00
+
+  - name: qtcreate
+    processes:
+      - Qt Creator
+    actions:
+      - name: Copy QT CREATOR
+        action: ctrl+c
+        color: 0xffff00
+      - name: Cut QT CREATOR
+        action: ctrl+x
+        color: 0xff0000
+      - name: Paste QT CREATOR
+        action: ctrl+v
+        color: 0x00ff00

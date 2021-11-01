@@ -11,6 +11,9 @@ main_window::main_window(QWidget *parent) : QMainWindow(parent), _ui(new Ui::mai
 
     auto wheel_window = new wheel();
     hide();
+
+    pen_wheel_config config = pen_wheel_config("/Users/osum4est/Documents/Dev/PenWheel/res/default_config.yml");
+    qDebug() << "NUMBER " << config.wheels().size();
 }
 
 main_window::~main_window() {

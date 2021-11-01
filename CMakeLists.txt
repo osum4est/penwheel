@@ -9,10 +9,9 @@ set(CMAKE_AUTORCC ON)
 
 include_directories(.)
 
-add_subdirectory(pen_wheel)
+add_subdirectory(lib/yaml-cpp)
 
-include_directories(lib/json/include)
-add_subdirectory(lib/json)
-
-include_directories(lib/cereal/include)
 add_subdirectory(lib/cereal)
+include_directories(lib/cereal/include)
+
+add_subdirectory(pen_wheel)
