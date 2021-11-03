@@ -1,5 +1,4 @@
 #include "mouse_events.h"
-#include <iostream>
 #include <qapplication.h>
 
 bool mouse_events::run(mouse_event_handler *handler) {
@@ -18,6 +17,62 @@ bool mouse_events::mouse_down(const Qt::MouseButton &button) {
 bool mouse_events::mouse_up(const Qt::MouseButton &button) {
     return _handler != nullptr && _handler->mouse_up(button);
 }
+
+#ifdef WIN32
+
+#include <Windows.h>
+#include <windowsx.h>
+
+HHOOK sHookMouse;
+mouse_events *self = nullptr;
+
+Qt::MouseButton get_button_from_lparam(LPARAM l) {
+    switch (((MSLLHOOKSTRUCT *) l)->mouseData >> 16) {
+        case XBUTTON1:
+            return Qt::BackButton;
+        case XBUTTON2:
+            return Qt::ForwardButton;
+    }
+    return Qt::NoButton;
+}
+
+bool mouse_events::run() {
+    self = this;
+    sHookMouse = ::SetWindowsHookExA(
+            WH_MOUSE_LL,
+            [](int i, WPARAM w, LPARAM l) {
+                if (i < 0)
+                    return ::CallNextHookEx(sHookMouse, i, w, l);
+
+                switch (w) {
+                    case WM_MOUSEMOVE:
+                        return self->mouse_moved(QCursor::pos()) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_LBUTTONDOWN:
+                        return self->mouse_down(Qt::LeftButton) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_LBUTTONUP:
+                        return self->mouse_up(Qt::LeftButton) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_RBUTTONDOWN:
+                        return self->mouse_down(Qt::RightButton) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_RBUTTONUP:
+                        return self->mouse_up(Qt::RightButton) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_MBUTTONDOWN:
+                        return self->mouse_down(Qt::MiddleButton) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_MBUTTONUP:
+                        return self->mouse_up(Qt::MiddleButton) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    case WM_XBUTTONDOWN:
+                        return self->mouse_down(get_button_from_lparam(l)) ? TRUE : ::CallNextHookEx(sHookMouse, i, w,
+                                                                                                     l);
+                    case WM_XBUTTONUP:
+                        return self->mouse_up(get_button_from_lparam(l)) ? TRUE : ::CallNextHookEx(sHookMouse, i, w, l);
+                    default:
+                        return ::CallNextHookEx(sHookMouse, i, w, l);
+                }
+            }, 0, 0);
+
+    return sHookMouse != NULL;
+}
+
+#endif
 
 #ifdef __APPLE__
 
