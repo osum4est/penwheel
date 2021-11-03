@@ -63,8 +63,8 @@ bool wheel::mouse_up(const Qt::MouseButton &button) {
 
     if (button == Qt::BackButton)
         set_state(hidden);
-    else if (button == Qt::LeftButton)
-        set_state(hidden);
+    else if (button == Qt::LeftButton && _state == active)
+        set_state(floating);
 
     // Since we are natively handing events (so that we don't take focus from the current app) we need to manually tell
     // qt about the event
