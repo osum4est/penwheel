@@ -6,12 +6,25 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 set(TARGET_NAME ${PROJECT_NAME})
 set(TARGET_SOURCES
         main.cpp
-        windows/main_window.cpp
-        windows/main_window.h
-        windows/main_window.ui
-        windows/wheel.cpp
-        windows/wheel.h
-        windows/wheel.ui widgets/wheel_widget.cpp widgets/wheel_widget.h widgets/wheel_widget.ui utils/mouse_events.cpp utils/mouse_events.h config/pen_wheel_config.cpp config/pen_wheel_config.h)
+        windows/pen_wheel_window.cpp
+        windows/pen_wheel_window.h
+        windows/pen_wheel_window.ui
+        widgets/wheel_widget.cpp
+        widgets/wheel_widget.h
+        widgets/wheel_widget.ui
+        utils/mouse_events.cpp
+        utils/mouse_events.h
+        config/pen_wheel_config.cpp
+        config/pen_wheel_config.h
+        config/pen_wheel_action.cpp
+        config/pen_wheel_action.h
+        pen_wheel.cpp
+        pen_wheel.h
+        config/pen_wheel_color.cpp
+        config/pen_wheel_color.h
+        utils/processes.cpp
+        utils/processes.h
+        utils/processes_mac.mm)
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${TARGET_NAME} MANUAL_FINALIZATION ${TARGET_SOURCES})

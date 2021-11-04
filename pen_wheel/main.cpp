@@ -1,10 +1,9 @@
 #include <QApplication>
-#include "windows/main_window.h"
+#include "pen_wheel.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    main_window w;
-    w.clearFocus();
-    w.hide();
+    pen_wheel app;
+    app.start();
     return QApplication::exec();
 }

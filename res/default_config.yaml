@@ -1,0 +1,69 @@
+slice_size: 10
+slice_padding: 10
+wheel_to_wheel_delay: 10
+wheel_size: 250
+single_press_shortcut: ctrl+c
+single_press_wheel: default
+double_press_shortcut: press ctrl+v
+double_press_wheel: default
+
+colors:
+  red: 0xab4642
+
+palettes:
+  rainbow:
+    - red
+    - 0xdc9656
+    - 0xf7ca88
+    - 0xa1b56c
+    - 0x86c1b9
+    - 0x7cafc2
+    - 0xba8baf
+    - 0xa16946
+
+# action groups?
+# reuse actions?
+
+wheels:
+  - name: default
+    palette: rainbow
+    options:
+      - name: One
+        color: 0xff0000
+        action: press ctrl+c
+
+      - name: Two
+        action: press ctrl+x
+
+      - name: Three
+        action: press ctrl+v
+
+      - name: Four
+        action: press ctrl+v
+        color: 0x33ffffff
+
+      - name: Five
+        action: press ctrl+v
+
+      - name: Six
+        action: press ctrl+v
+
+      - name: Seven
+        action: press ctrl+v
+
+      - name: Eight
+        action: press ctrl+v
+
+  - name: qtcreate
+    processes:
+      - Qt Creator
+    options:
+      - name: Copy QT
+        action: press ctrl+c
+        color: 0xffff00
+      - name: Cut QT
+        action: press ctrl+x
+        color: 0xff0000
+      - name: Paste QT
+        action: press ctrl+v
+        color: 0x00ff00

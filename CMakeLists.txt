@@ -15,3 +15,5 @@ add_subdirectory(lib/cereal)
 include_directories(lib/cereal/include)
 
 add_subdirectory(pen_wheel)
+
+configure_file(res/default_config.yaml pen_wheel/config.yaml COPYONLY)

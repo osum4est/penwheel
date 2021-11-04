@@ -2,6 +2,8 @@
 #define PEN_WHEEL_WHEEL_WIDGET_H
 
 #include <QWidget>
+#include <config/pen_wheel_action.h>
+#include <config/pen_wheel_config.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class wheel_widget; }
@@ -11,54 +13,25 @@ class wheel_widget : public QWidget {
 Q_OBJECT
 
     Ui::wheel_widget *_ui;
-    int _slices = 12;
+
+    int _slices = 0;
+    float _slice_size = 0;
+    float _slice_offset = 0;
+
+    float _slice_length = 100;
+    float _slice_padding = 5;
+
     int _selected_slice = -1;
-
-    float _slice_padding = 10;
-    float _slice_size = 360.0f / (float)_slices;
-    float _slice_offset = -_slice_size / 2;
-
-    QColor _colors[16] = {
-        QColor(0xab, 0x46, 0x42),
-        QColor(0xdc, 0x96, 0x56),
-        QColor(0xf7, 0xca, 0x88),
-        QColor(0xa1, 0xb5, 0x6c),
-        QColor(0x86, 0xc1, 0xb9),
-        QColor(0x7c, 0xaf, 0xc2),
-        QColor(0xba, 0x8b, 0xaf),
-        QColor(0xa1, 0x69, 0x46),
-        QColor(0xab, 0x46, 0x42),
-        QColor(0xdc, 0x96, 0x56),
-        QColor(0xf7, 0xca, 0x88),
-        QColor(0xa1, 0xb5, 0x6c),
-        QColor(0x86, 0xc1, 0xb9),
-        QColor(0x7c, 0xaf, 0xc2),
-        QColor(0xba, 0x8b, 0xaf),
-        QColor(0xa1, 0x69, 0x46),
-    };
-
-    QString _labels[16] = {
-            "Cut",
-            "Copy",
-            "Paste",
-            "New Layer",
-            "Delete Layer",
-            "Ctrl",
-            "Alt",
-            "Shift",
-            "Cut",
-            "Copy",
-            "Paste",
-            "New Layer",
-            "Delete Layer",
-            "Ctrl",
-            "Alt",
-            "Shift"
-    };
+    const pen_wheel_wheel *_wheel = nullptr;
 
 public:
     explicit wheel_widget(QWidget *parent = nullptr);
     ~wheel_widget() override;
+
+    void set_wheel(const pen_wheel_wheel *wheel);
+
+signals:
+    void option_selected(const pen_wheel_option *option);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -66,6 +39,5 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 };
-
 
 #endif
