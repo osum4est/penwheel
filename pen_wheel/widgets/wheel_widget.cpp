@@ -48,8 +48,8 @@ void wheel_widget::paintEvent(QPaintEvent *event) {
 
     for (int i = 0; i < _slices; i++) {
         const pen_wheel_option *option = &_wheel->options()[i];
-        QColor color =
-                palette && !option->color().set() ? palette->at(i % palette->size()).color() : option->color().color();
+        QColor color = palette && !option->color().set() ?
+                       palette->at(i % palette->size()).color() : option->color().color();
 
         painter.setPen(QPen(color.darker(), border_width));
         painter.setBrush(QBrush(_selected_slice == i ? color.lighter() : color));
@@ -132,14 +132,15 @@ void wheel_widget::mouseMoveEvent(QMouseEvent *event) {
     QPointF rel = pos - center;
     rel.setY(-rel.y());
 
+    int slice = -1;
+
     int min_dist = geometry().width() / 6;
-    if (rel.manhattanLength() < min_dist)
-        return;
+    if (rel.manhattanLength() > min_dist) {
+        auto angle = (float) qRadiansToDegrees(atan2(rel.y(), rel.x()));
+        float slice_angle = 360 - angle + 90 - _slice_offset;
+        slice = int(float(int(slice_angle) % 360) / _slice_size);
+    }
 
-    auto angle = (float) qRadiansToDegrees(atan2(rel.y(), rel.x()));
-    float slice_angle = 360 - angle + 90 - _slice_offset;
-
-    int slice = int(float(int(slice_angle) % 360) / _slice_size);
     if (slice == _selected_slice)
         return;
 
