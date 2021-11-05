@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <utils/processes.h>
 #include <pen_wheel.h>
+#include <utils/key_sender.h>
 
 pen_wheel_window::pen_wheel_window(QWidget *parent) : QDialog(parent), _ui(new Ui::pen_wheel_window) {
     _ui->setupUi(this);
@@ -65,8 +66,20 @@ void pen_wheel_window::open_wheel() {
 }
 
 void pen_wheel_window::option_selected(const pen_wheel_option *option) {
-    qDebug() << option->action().type();
-    qDebug() << QString::fromStdString(option->action().value());
+    qDebug() << "Sending:" << QString::fromStdString(option->action().value());
+    switch (option->action().type()) {
+        case pen_wheel_action::none:
+            break;
+        case pen_wheel_action::press:
+            _key_sender.send_key(pen_wheel_key_combination(option->action().value()));
+            break;
+        case pen_wheel_action::hold:
+            _key_sender.hold_key(pen_wheel_key_combination(option->action().value()));
+            break;
+        case pen_wheel_action::wheel:
+            // Handled when option is hovered over
+            break;
+    }
 }
 
 bool pen_wheel_window::mouse_moved(const QPointF &pos) {

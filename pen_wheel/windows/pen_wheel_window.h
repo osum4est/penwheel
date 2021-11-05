@@ -5,6 +5,7 @@
 #include <QThread>
 #include <utils/mouse_events.h>
 #include <config/pen_wheel_config.h>
+#include <utils/key_sender.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class pen_wheel_window; }
@@ -23,6 +24,7 @@ public:
 private:
     Ui::pen_wheel_window *_ui;
     mouse_events _mouse_events;
+    key_sender _key_sender;
     wheel_state _state;
 
 public:

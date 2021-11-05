@@ -24,13 +24,22 @@ set(TARGET_SOURCES
         config/pen_wheel_color.h
         utils/processes.cpp
         utils/processes.h
-        utils/processes_mac.mm)
+        utils/processes_mac.mm
+        utils/key_sender.cpp
+        utils/key_sender.h
+        config/pen_wheel_key_combination.cpp
+        config/pen_wheel_key_combination.h)
 
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${TARGET_NAME} MANUAL_FINALIZATION ${TARGET_SOURCES})
 else ()
     add_executable(${TARGET_NAME} ${TARGET_SOURCES})
 endif ()
+
+if (APPLE)
+    find_library(CARBON_LIBRARY Carbon)
+    target_link_libraries(${TARGET_NAME} PRIVATE ${CARBON_LIBRARY})
+endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE yaml-cpp)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
