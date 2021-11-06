@@ -1,7 +1,9 @@
-slice_size: 10
-slice_padding: 10
+wheel_size: 275
+wheel_hole_size: 100
+slice_padding: 5
+slice_border_width: 3
+font:
 wheel_to_wheel_delay: 10
-wheel_size: 250
 single_press_shortcut: ctrl+c
 single_press_wheel: default
 double_press_shortcut: press ctrl+v
@@ -28,19 +30,17 @@ wheels:
   - name: default
     palette: rainbow
     options:
-      - name: One
-        color: 0xff0000
-        action: press ctrl+c
+      - name: Copy
+        action: press meta+c
 
-      - name: Two
-        action: press ctrl+x
+      - name: Cut
+        action: press meta+x
 
-      - name: Three
-        action: press ctrl+v
+      - name: Paste
+        action: press meta+v
 
       - name: Four
         action: press ctrl+v
-        color: 0x33ffffff
 
       - name: Five
         action: press ctrl+v
@@ -53,6 +53,18 @@ wheels:
 
       - name: Eight
         action: press ctrl+v
+
+      - name: New Layer
+        action: press meta+c
+
+      - name: Delete Layer
+        action: press meta+x
+
+      - name: Duplicate Layer
+        action: press meta+v
+
+      - name: New File
+        action: press meta+v
 
   - name: qtcreate
     processes:

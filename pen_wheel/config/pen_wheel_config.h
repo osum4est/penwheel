@@ -32,7 +32,11 @@ CEREAL_YAML_FINALIZE(pen_wheel_wheel)
 
 class pen_wheel_config {
     CEREAL_BEGIN(pen_wheel_config)
-    CEREAL_PROP_DEFAULT(wheel_size, int, 250)
+    CEREAL_PROP_DEFAULT(wheel_size, float, 250)
+    CEREAL_PROP_DEFAULT(wheel_hole_size, float, 50)
+    CEREAL_PROP_DEFAULT(slice_padding, float, 5)
+    CEREAL_PROP_DEFAULT(slice_border_width, float, 3)
+    CEREAL_PROP(font, std::string)
     CEREAL_PROP(single_press_shortcut, pen_wheel_key_combination)
     CEREAL_PROP(single_press_wheel, std::string)
     CEREAL_PROP(double_press_shortcut, pen_wheel_key_combination)

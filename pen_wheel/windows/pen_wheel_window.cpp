@@ -25,11 +25,6 @@ pen_wheel_window::pen_wheel_window(QWidget *parent) : QDialog(parent), _ui(new U
 
     _mouse_events.run(this);
     set_state(hidden);
-
-    setFixedWidth(pen_wheel::config()->wheel_size() + 200);
-    setFixedHeight(pen_wheel::config()->wheel_size() + 200);
-    _ui->wheel->setFixedWidth(pen_wheel::config()->wheel_size() + 200);
-    _ui->wheel->setFixedHeight(pen_wheel::config()->wheel_size() + 200);
 }
 
 pen_wheel_window::~pen_wheel_window() {
@@ -37,6 +32,11 @@ pen_wheel_window::~pen_wheel_window() {
 }
 
 void pen_wheel_window::open_wheel() {
+    setFixedWidth(qRound(pen_wheel::config()->wheel_size()));
+    setFixedHeight(qRound(pen_wheel::config()->wheel_size()));
+    _ui->wheel->setFixedWidth(qRound(pen_wheel::config()->wheel_size()));
+    _ui->wheel->setFixedHeight(qRound(pen_wheel::config()->wheel_size()));
+
     std::string current_process = processes::get_active_process().name;
     const pen_wheel_wheel *wheel = nullptr;
     const auto &wheels = pen_wheel::config()->wheels();

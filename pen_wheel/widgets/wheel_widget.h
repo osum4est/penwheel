@@ -14,15 +14,18 @@ Q_OBJECT
 
     Ui::wheel_widget *_ui;
 
+    const pen_wheel_wheel *_wheel = nullptr;
+
+    float _wheel_size = 0;
+    float _wheel_hole_size = 0;
+    float _slice_padding = 0;
+    float _border_width = 0;
+
     int _slices = 0;
     float _slice_size = 0;
     float _slice_offset = 0;
 
-    float _slice_length = 100;
-    float _slice_padding = 5;
-
     int _selected_slice = -1;
-    const pen_wheel_wheel *_wheel = nullptr;
 
 public:
     explicit wheel_widget(QWidget *parent = nullptr);

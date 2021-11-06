@@ -16,9 +16,16 @@ wheel_widget::~wheel_widget() {
 
 void wheel_widget::set_wheel(const pen_wheel_wheel *wheel) {
     _wheel = wheel;
+
+    _wheel_size = pen_wheel::config()->wheel_size();
+    _wheel_hole_size = pen_wheel::config()->wheel_hole_size();
+    _slice_padding = pen_wheel::config()->slice_padding();
+    _border_width = pen_wheel::config()->slice_border_width();
+
     _slices = (int) wheel->options().size();
     _slice_size = 360.0f / (float) _slices;
     _slice_offset = -_slice_size / 2;
+
     repaint();
 }
 
@@ -26,100 +33,68 @@ void wheel_widget::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
 
     const pen_wheel_config *config = pen_wheel::config();
+    const pen_wheel_palette *palette = config->find_palette(_wheel->palette());
 
-    float border_width = 3;
-    float wheel_size = (float) config->wheel_size();
-
-    float cx = geometry().width() / 2;
-    float cy = geometry().height() / 2;
-
-//    const int width = geometry().width() - border_width;
-//    const int height = geometry().height() - border_width;
-//    const int x = border_width / 2;
-//    const int y = border_width / 2;
+    float cx = (float) geometry().width() / 2;
+    float cy = (float) geometry().height() / 2;
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-
     painter.translate(cx, cy);
 
-    const pen_wheel_palette *palette = config->find_palette(_wheel->palette());
+    QFont font(QString::fromStdString(config->font()));
+    font.setPointSizeF(10);
+    painter.setFont(font);
 
     for (int i = 0; i < _slices; i++) {
         const pen_wheel_option *option = &_wheel->options()[i];
         QColor color = palette && !option->color().set() ?
                        palette->at(i % palette->size()).color() : option->color().color();
 
-        painter.setPen(QPen(color.darker(), border_width));
+        painter.setPen(QPen(color.darker(), _border_width));
         painter.setBrush(QBrush(_selected_slice == i ? color.lighter() : color));
 
         float start = 90 - _slice_offset;
         start -= (float) i * _slice_size;
         start -= _slice_padding / 2;
-
         float size = _slice_size - _slice_padding;
 
-        float sliceangle = start - (size / 2);
-        float gap_distance = 50;
-
-//        QPainterPath path;
-//        path.setFillRule(Qt::WindingFill);
-//        path.translate(geometry().width() / 2, geometry().height() / 2);
-//        path.translate(
-//                gap_distance * cos(qDegreesToRadians(sliceangle)),
-//                -gap_distance * sin(qDegreesToRadians(sliceangle))
-//                );
-//        path.arcTo(x, y, width, height, start, -size);
-//        path.closeSubpath();
-//        painter.drawPath(path);
-//
         QPainterPath path;
         path.setFillRule(Qt::WindingFill);
-        path.arcTo(-wheel_size / 2, -wheel_size / 2, wheel_size, wheel_size, start, -size);
+        path.arcTo(-_wheel_size / 2, -_wheel_size / 2, _wheel_size, _wheel_size, start, -size);
         path.closeSubpath();
         QPainterPath cut;
-        cut.addEllipse(QPointF(0, 0), gap_distance, gap_distance);
+        cut.addEllipse(QPointF(0, 0), _wheel_hole_size / 2, _wheel_hole_size / 2);
         painter.drawPath(path.subtracted(cut));
 
-        int box_amount = _slices / 2 + 1;
-        bool right = i < box_amount;
-        int box_y = right ? i : _slices - i;
-        float box_wheel_padding = 20;
-        float box_height = 20;
-        float box_width = 100;
-        float height_with_boxes = wheel_size + box_wheel_padding + box_wheel_padding + box_height;
 
-        float x;
-        if (right)
-            x = qMax(wheel_size / 2 * cos(qDegreesToRadians(start)),
-                     wheel_size / 2 * cos(qDegreesToRadians(start - size)))
-                + box_wheel_padding;
-        else
-            x = qMin(wheel_size / 2 * cos(qDegreesToRadians(start)),
-                     wheel_size / 2 * cos(qDegreesToRadians(start - size)))
-                - box_wheel_padding - box_width;
+        QString label = QString::fromStdString(option->name());
+        float slice_width = _wheel_hole_size * qSin(size / _wheel_hole_size);
+        float label_angle = start - (size / 2);
+        float label_padding = slice_width / 5;
+        float label_x = (_wheel_size / 2 + _wheel_hole_size / 2) / 2;
+        float label_y = 0;
 
-        if (box_y == 0 || (_slices % 2 == 0 && i == _slices / 2))
-            x = -box_width / 2;
-
-        float y = height_with_boxes / 2 + box_height / 2;
-        y -= height_with_boxes / (box_amount - 1) * box_y;
-
-        painter.drawRoundedRect(x, -y, box_width, box_height, 5, 5);
-
-        QFont font;
-        font.setPixelSize(16);
-        painter.setPen(QPen(Qt::black, 10));
+        font.setPixelSize(qRound(slice_width));
         painter.setFont(font);
-        painter.drawText(
-                x,
-                -y,
-                box_width,
-                box_height,
-                Qt::AlignCenter,
-                QString::fromStdString(option->name())
-        );
+
+        QRect label_size = painter.fontMetrics().boundingRect(label);
+        float label_max_width = (_wheel_size / 2 - _wheel_hole_size / 2) - label_padding * 2;
+        float factor = (label_max_width) / (float) label_size.width();
+        if (factor > 1)
+            factor = 1;
+
+        painter.save();
+        painter.rotate(-label_angle);
+        painter.scale(factor, factor);
+        painter.translate(qRound(label_x / factor), qRound(label_y / factor));
+        if (label_angle + 90 <= 0) painter.rotate(180);
+        painter.translate(qRound(-(float) label_size.width() / 2), qRound(-(float) label_size.height() / 2));
+
+        painter.setPen(QPen(Qt::black, 10));
+        painter.drawText(0, 0, label_size.width(), label_size.height(), Qt::AlignCenter, label);
+        painter.restore();
     }
 }
 
@@ -134,9 +109,9 @@ void wheel_widget::mouseMoveEvent(QMouseEvent *event) {
 
     int slice = -1;
 
-    int min_dist = geometry().width() / 6;
+    float min_dist = _wheel_hole_size / 2;
     if (rel.manhattanLength() > min_dist) {
-        auto angle = (float) qRadiansToDegrees(atan2(rel.y(), rel.x()));
+        auto angle = (float) qRadiansToDegrees(qAtan2(rel.y(), rel.x()));
         float slice_angle = 360 - angle + 90 - _slice_offset;
         slice = int(float(int(slice_angle) % 360) / _slice_size);
     }
