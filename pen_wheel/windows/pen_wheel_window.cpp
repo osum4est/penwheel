@@ -39,14 +39,14 @@ void pen_wheel_window::open_wheel() {
     _ui->wheel->setFixedWidth(size);
     _ui->wheel->setFixedHeight(size);
 
-    std::string current_process = processes::get_active_process().name;
+    QString current_process = QString::fromStdString(processes::get_active_process().name);
     const pen_wheel_wheel *wheel = nullptr;
     const auto &wheels = pen_wheel::config()->wheels();
 
-    qDebug() << "Current app: " << QString::fromStdString(current_process);
+    qDebug() << "Current app: " << current_process;
     for (const auto &config_wheel: wheels) {
         for (const auto &process: config_wheel.processes()) {
-            if (process == current_process) {
+            if (QString::fromStdString(process).toLower() == current_process.toLower()) {
                 wheel = &config_wheel;
                 break;
             }
@@ -63,8 +63,8 @@ void pen_wheel_window::open_wheel() {
     }
 
     _ui->wheel->set_wheel(wheel);
-    show();
     move_window(QCursor::pos());
+    show();
 }
 
 void pen_wheel_window::option_hover(const pen_wheel_option *option) {
