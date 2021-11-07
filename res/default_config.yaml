@@ -31,13 +31,13 @@ wheels:
     palette: rainbow
     options:
       - name: Copy
-        action: press meta+c
+        action: press ctrl+c
 
       - name: Cut
-        action: press meta+x
+        action: press ctrl+x
 
       - name: Paste
-        action: press meta+v
+        action: press ctrl+v
 
       - name: Four
         action: press ctrl+v
@@ -55,16 +55,16 @@ wheels:
         action: press ctrl+v
 
       - name: New Layer
-        action: press meta+c
+        action: press ctrl+c
 
       - name: Delete Layer
         action: wheel code
 
       - name: Duplicate Layer
-        action: press meta+v
+        action: press ctrl+v
 
       - name: New File
-        action: press meta+v
+        action: press ctrl+v
 
   - name: code
     options:

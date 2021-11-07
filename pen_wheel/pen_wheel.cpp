@@ -8,7 +8,7 @@ void pen_wheel::start() {
     _config_path = "config.yaml";
 
     load_config();
-    _config_watcher.addPath(QString::fromStdString(_config_path));
+    _config_watcher.addPath(QString::fromStdString(_config_path.string()));
 
     connect(&_config_watcher, &QFileSystemWatcher::fileChanged, this, &pen_wheel::config_changed);
 

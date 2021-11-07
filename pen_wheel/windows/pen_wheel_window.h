@@ -28,6 +28,7 @@ private:
     wheel_state _state;
 
     const pen_wheel_wheel *_wheel_action_wheel = nullptr;
+    const pen_wheel_key_combination *_held_combo = nullptr; // TODO: Support releasing key combos
 
 public:
     explicit pen_wheel_window(QWidget *parent = nullptr);

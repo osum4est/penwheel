@@ -1,11 +1,126 @@
 #include "key_sender.h"
+#include <QKeySequence>
+
+#ifdef WIN32
+
+#include <Windows.h>
+#include <WinUser.h>
+
+void send_keys(const std::vector<WORD> &keys, bool down) {
+    for (DWORD key: keys) {
+        INPUT input;
+        input.type = INPUT_KEYBOARD;
+        input.ki.wScan = 0;
+        input.ki.time = 0;
+        input.ki.dwExtraInfo = 0;
+        input.ki.wVk = key;
+        input.ki.dwFlags = down ? 0 : KEYEVENTF_KEYUP;
+        SendInput(1, &input, sizeof(INPUT));
+    }
+}
+
+DWORD string_to_key_code(const std::string &string) {
+    if (string.size() != 1)
+        return UINT16_MAX;
+
+    DWORD key_code = VkKeyScan(string[0]) & 0xff;
+    if (key_code >= 0)
+        return key_code;
+
+    return UINT16_MAX;
+}
+
+DWORD get_key_code(Qt::Key key) {
+    DWORD code = string_to_key_code(QKeySequence(key).toString().toLower().toStdString());
+    if (code != UINT16_MAX)
+        return code;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
+    switch (key) {
+        case Qt::Key_Escape: return VK_ESCAPE;
+        case Qt::Key_F1: return VK_F1;
+        case Qt::Key_F2: return VK_F2;
+        case Qt::Key_F3: return VK_F3;
+        case Qt::Key_F4: return VK_F4;
+        case Qt::Key_F5: return VK_F5;
+        case Qt::Key_F6: return VK_F6;
+        case Qt::Key_F7: return VK_F7;
+        case Qt::Key_F8: return VK_F8;
+        case Qt::Key_F9: return VK_F9;
+        case Qt::Key_F10: return VK_F10;
+        case Qt::Key_F11: return VK_F11;
+        case Qt::Key_F12: return VK_F12;
+        case Qt::Key_Backspace: return VK_BACK;
+        case Qt::Key_Tab: return VK_TAB;
+        case Qt::Key_CapsLock: return VK_CAPITAL;
+        case Qt::Key_Enter: return VK_RETURN;
+        case Qt::Key_Shift: return VK_SHIFT;
+        case Qt::Key_Control: return VK_CONTROL;
+        case Qt::Key_Meta: return VK_LWIN;
+        case Qt::Key_Alt: return VK_MENU;
+        case Qt::Key_Space: return VK_SPACE;
+
+        case Qt::Key_Insert: return UINT16_MAX;
+        case Qt::Key_Home: return VK_HOME;
+        case Qt::Key_PageUp: return VK_PRIOR;
+        case Qt::Key_PageDown: return VK_NEXT;
+        case Qt::Key_Delete: return VK_DELETE;
+        case Qt::Key_End: return VK_END;
+
+        case Qt::Key_Left: return VK_LEFT;
+        case Qt::Key_Right: return VK_RIGHT;
+        case Qt::Key_Up: return VK_UP;
+        case Qt::Key_Down: return VK_DOWN;
+    }
+#pragma clang diagnostic pop
+
+    return UINT16_MAX;
+}
+
+std::vector<WORD> get_keys(const pen_wheel_key_combination &combo) {
+    std::vector<WORD> keys;
+
+    if (combo.modifiers().testFlag(Qt::ControlModifier))
+        keys.push_back(VK_CONTROL);
+    if (combo.modifiers().testFlag(Qt::ShiftModifier))
+        keys.push_back(VK_SHIFT);
+    if (combo.modifiers().testFlag(Qt::MetaModifier))
+        keys.push_back(VK_LWIN);
+    if (combo.modifiers().testFlag(Qt::AltModifier))
+        keys.push_back(VK_MENU);
+
+    Qt::Key key = combo.key();
+    DWORD key_code = get_key_code(key);
+    if (key_code != UINT16_MAX)
+        keys.push_back(key_code);
+
+    return keys;
+}
+
+void key_sender::send_key(const pen_wheel_key_combination &combo) {
+    std::vector<WORD> keys = get_keys(combo);
+    send_keys(keys, true);
+    send_keys(keys, false);
+}
+
+void key_sender::hold_key(const pen_wheel_key_combination &combo) {
+    std::vector<WORD> keys = get_keys(combo);
+    send_keys(keys, true);
+}
+
+void key_sender::release_key(const pen_wheel_key_combination &combo) {
+    std::vector<WORD> keys = get_keys(combo);
+    send_keys(keys, false);
+}
+
+#endif
 
 #ifdef __APPLE__
 
 #include <ApplicationServices/ApplicationServices.h>
 #include <Carbon/Carbon.h>
 #include <objc/objc.h>
-#include <QKeySequence>
 
 std::string key_code_to_string(CGKeyCode key_code) {
     TISInputSourceRef current_keyboard = TISCopyCurrentKeyboardInputSource();
@@ -49,7 +164,7 @@ CGKeyCode get_key_code(Qt::Key key) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch"
     switch (key) {
-        case Qt::Key_Escape: return kVK_Return;
+        case Qt::Key_Escape: return kVK_Escape;
         case Qt::Key_F1: return kVK_F1;
         case Qt::Key_F2: return kVK_F2;
         case Qt::Key_F3: return kVK_F3;
@@ -89,22 +204,22 @@ CGKeyCode get_key_code(Qt::Key key) {
     return UINT16_MAX;
 }
 
-void key_sender::send_key(const pen_wheel_key_combination &key) {
+void key_sender::send_key(const pen_wheel_key_combination &combo) {
     CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
 
-    CGKeyCode key_code = get_key_code(key.key());
+    CGKeyCode key_code = get_key_code(combo.key());
     if (key_code == UINT16_MAX)
         return;
 
     CGEventFlags flags = 0;
 
-    if (key.modifiers().testFlag(Qt::ControlModifier))
+    if (combo.modifiers().testFlag(Qt::ControlModifier))
         flags |= kCGEventFlagMaskControl;
-    if (key.modifiers().testFlag(Qt::ShiftModifier))
+    if (combo.modifiers().testFlag(Qt::ShiftModifier))
         flags |= kCGEventFlagMaskShift;
-    if (key.modifiers().testFlag(Qt::MetaModifier))
+    if (combo.modifiers().testFlag(Qt::MetaModifier))
         flags |= kCGEventFlagMaskCommand;
-    if (key.modifiers().testFlag(Qt::AltModifier))
+    if (combo.modifiers().testFlag(Qt::AltModifier))
         flags |= kCGEventFlagMaskAlternate;
 
     CGEventRef key_down = CGEventCreateKeyboardEvent(source, key_code, YES);
@@ -123,10 +238,10 @@ void key_sender::send_key(const pen_wheel_key_combination &key) {
 void key_sender::hold_key(const pen_wheel_key_combination &combo) {
     // TODO
     // Looks like we need to create an event listener and add our modifiers to all events
-    // Simply sending keyDown=YES does not keep the key help down
+    // Simply sending keyDown=YES does not keep the key held down
 }
 
-void key_sender::release_key() {
+void key_sender::release_key(const pen_wheel_key_combination &combo) {
 }
 
 #endif

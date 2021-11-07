@@ -4,7 +4,7 @@
 #include <string>
 
 struct process {
-    int pid;
+    unsigned long pid;
     std::string name;
 };
 

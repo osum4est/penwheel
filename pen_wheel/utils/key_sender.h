@@ -9,7 +9,7 @@ class key_sender {
 public:
     void send_key(const pen_wheel_key_combination &combo);
     void hold_key(const pen_wheel_key_combination &combo);
-    void release_key();
+    void release_key(const pen_wheel_key_combination &combo);
 };
 
 #endif
