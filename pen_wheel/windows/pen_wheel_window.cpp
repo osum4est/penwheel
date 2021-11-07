@@ -33,10 +33,11 @@ pen_wheel_window::~pen_wheel_window() {
 }
 
 void pen_wheel_window::open_wheel() {
-    setFixedWidth(qRound(pen_wheel::config()->wheel_size()));
-    setFixedHeight(qRound(pen_wheel::config()->wheel_size()));
-    _ui->wheel->setFixedWidth(qRound(pen_wheel::config()->wheel_size()));
-    _ui->wheel->setFixedHeight(qRound(pen_wheel::config()->wheel_size()));
+    int size = qRound(pen_wheel::config()->wheel_size() + pen_wheel::config()->slice_border_width());
+    setFixedWidth(size);
+    setFixedHeight(size);
+    _ui->wheel->setFixedWidth(size);
+    _ui->wheel->setFixedHeight(size);
 
     std::string current_process = processes::get_active_process().name;
     const pen_wheel_wheel *wheel = nullptr;
