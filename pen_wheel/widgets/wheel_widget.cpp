@@ -16,6 +16,7 @@ wheel_widget::~wheel_widget() {
 
 void wheel_widget::set_wheel(const pen_wheel_wheel *wheel) {
     _wheel = wheel;
+    _selected_slice = -1;
 
     _wheel_size = pen_wheel::config()->wheel_size();
     _wheel_hole_size = pen_wheel::config()->wheel_hole_size();
@@ -67,7 +68,6 @@ void wheel_widget::paintEvent(QPaintEvent *event) {
         QPainterPath cut;
         cut.addEllipse(QPointF(0, 0), _wheel_hole_size / 2, _wheel_hole_size / 2);
         painter.drawPath(path.subtracted(cut));
-
 
         QString label = QString::fromStdString(option->name());
         float slice_width = _wheel_hole_size * qSin(size / _wheel_hole_size);
@@ -121,6 +121,9 @@ void wheel_widget::mouseMoveEvent(QMouseEvent *event) {
 
     _selected_slice = slice;
     repaint();
+
+    if (_selected_slice >= 0) emit option_hover(&_wheel->options().at(_selected_slice));
+    else emit option_hover(nullptr);
 }
 
 void wheel_widget::mousePressEvent(QMouseEvent *event) {
@@ -130,9 +133,7 @@ void wheel_widget::mousePressEvent(QMouseEvent *event) {
 void wheel_widget::mouseReleaseEvent(QMouseEvent *event) {
     QWidget::mouseReleaseEvent(event);
 
-    if (_selected_slice == -1)
-        return;
-
-    emit option_selected(&_wheel->options().at(_selected_slice));
+    if (_selected_slice >= 0) emit option_selected(&_wheel->options().at(_selected_slice));
+    else emit option_selected(nullptr);
     _selected_slice = -1;
 }

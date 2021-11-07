@@ -27,12 +27,15 @@ private:
     key_sender _key_sender;
     wheel_state _state;
 
+    const pen_wheel_wheel *_wheel_action_wheel = nullptr;
+
 public:
     explicit pen_wheel_window(QWidget *parent = nullptr);
     ~pen_wheel_window() override;
 
 private:
     void open_wheel();
+    void option_hover(const pen_wheel_option *option);
     void option_selected(const pen_wheel_option *option);
 
     bool mouse_moved(const QPointF &pos) override;

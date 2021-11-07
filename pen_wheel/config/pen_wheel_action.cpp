@@ -12,7 +12,7 @@ pen_wheel_action::pen_wheel_action(const std::string &action) : _action(action) 
         _type = press;
     else if (type == "hold")
         _type = hold;
-    else if (type == "pen_wheel_window")
+    else if (type == "wheel")
         _type = wheel;
 
 }

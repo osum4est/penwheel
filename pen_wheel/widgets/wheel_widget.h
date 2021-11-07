@@ -34,6 +34,7 @@ public:
     void set_wheel(const pen_wheel_wheel *wheel);
 
 signals:
+    void option_hover(const pen_wheel_option *option);
     void option_selected(const pen_wheel_option *option);
 
 protected:

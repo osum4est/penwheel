@@ -3,7 +3,7 @@ wheel_hole_size: 100
 slice_padding: 5
 slice_border_width: 3
 font:
-wheel_to_wheel_delay: 10
+wheel_action_delay: 100
 single_press_shortcut: ctrl+c
 single_press_wheel: default
 double_press_shortcut: press ctrl+v
@@ -58,13 +58,24 @@ wheels:
         action: press meta+c
 
       - name: Delete Layer
-        action: press meta+x
+        action: wheel code
 
       - name: Duplicate Layer
         action: press meta+v
 
       - name: New File
         action: press meta+v
+
+  - name: code
+    options:
+      - name: Refactor
+        color: 0xffff00
+      - name: New Class
+        action: press ctrl+x
+        color: 0xff0000
+      - name: Search
+        action: wheel qtcreate
+        color: 0x00ff00
 
   - name: qtcreate
     processes:

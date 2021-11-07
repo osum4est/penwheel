@@ -21,6 +21,7 @@ pen_wheel_window::pen_wheel_window(QWidget *parent) : QDialog(parent), _ui(new U
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAttribute(Qt::WA_ShowWithoutActivating, true);
 
+    connect(_ui->wheel, &wheel_widget::option_hover, this, &pen_wheel_window::option_hover);
     connect(_ui->wheel, &wheel_widget::option_selected, this, &pen_wheel_window::option_selected);
 
     _mouse_events.run(this);
@@ -65,8 +66,35 @@ void pen_wheel_window::open_wheel() {
     move_window(QCursor::pos());
 }
 
+void pen_wheel_window::option_hover(const pen_wheel_option *option) {
+    _wheel_action_wheel = nullptr;
+
+    if (option == nullptr) return;
+    if (option->action().type() != pen_wheel_action::wheel) return;
+
+    const pen_wheel_wheel *wheel = pen_wheel::config()->find_wheel(option->action().value());
+    if (wheel == nullptr) return;
+    _wheel_action_wheel = wheel;
+
+    QThread *thread = QThread::create([this, wheel] {
+        QThread::msleep(pen_wheel::config()->wheel_action_delay());
+        if (_wheel_action_wheel != wheel || _state == floating) return;
+        _wheel_action_wheel = nullptr;
+
+        QMetaObject::invokeMethod(this, [this, wheel]() {
+            _ui->wheel->set_wheel(wheel);
+            move_window(QCursor::pos());
+        }, Qt::QueuedConnection);
+    });
+
+    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+    thread->start();
+}
+
 void pen_wheel_window::option_selected(const pen_wheel_option *option) {
-    qDebug() << "Sending:" << QString::fromStdString(option->action().value());
+    if (option == nullptr) return;
+
+    qDebug() << "Selected:" << QString::fromStdString(option->name());
     switch (option->action().type()) {
         case pen_wheel_action::none:
             break;
@@ -113,15 +141,15 @@ bool pen_wheel_window::mouse_down(const Qt::MouseButton &button) {
 bool pen_wheel_window::mouse_up(const Qt::MouseButton &button) {
     bool handled = _state != hidden;
 
-    if (button == Qt::BackButton)
-        set_state(hidden);
-    else if (button == Qt::LeftButton && _state == active)
-        set_state(floating);
-
     if (handled) {
         QMouseEvent evt(QEvent::MouseButtonRelease, QCursor::pos(), button, button, Qt::NoModifier);
         QApplication::sendEvent(_ui->wheel, &evt);
     }
+
+    if (button == Qt::BackButton)
+        set_state(hidden);
+    else if (button == Qt::LeftButton && _state == active)
+        set_state(floating);
 
     return handled;
 }
@@ -147,4 +175,3 @@ void pen_wheel_window::set_state(pen_wheel_window::wheel_state state) {
             break;
     }
 }
-
